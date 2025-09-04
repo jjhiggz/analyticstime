@@ -65,8 +65,8 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
 
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="mb-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="mb-3">
         <h3 className="text-lg font-semibold text-gray-900">Net Sales by Product</h3>
         <p className="text-sm text-gray-500">
           Total: {formatCurrency(totalSales)} across all products
@@ -78,7 +78,7 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
         </p>
       </div>
       
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart 
             data={data} 

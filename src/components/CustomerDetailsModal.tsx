@@ -1,12 +1,12 @@
 import * as React from "react"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
-import { transactions, type CategoryType } from "../transactions.const"
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
+import { type CategoryType, transactions } from "../transactions.const"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "./ui/dialog"
 
 interface CustomerDetailsModalProps {
@@ -101,7 +101,7 @@ export const CustomerDetailsModal = ({
         
         <div className="mt-4">
           {data.length > 0 ? (
-            <div className="h-80">
+            <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -136,7 +136,7 @@ export const CustomerDetailsModal = ({
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-64 flex items-center justify-center">
               <p className="text-gray-500">No transaction data available for this customer</p>
             </div>
           )}

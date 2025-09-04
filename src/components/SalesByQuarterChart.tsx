@@ -76,8 +76,8 @@ export const SalesByQuarterChart = ({ selectedDealerId }: SalesByQuarterChartPro
   const totalSales = data.reduce((sum, quarter) => sum + quarter.sales, 0)
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="mb-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="mb-3">
         <h3 className="text-lg font-semibold text-gray-900">Net Sales by Quarter</h3>
         <p className="text-sm text-gray-500">
           Total: {formatCurrency(totalSales)}
@@ -89,7 +89,7 @@ export const SalesByQuarterChart = ({ selectedDealerId }: SalesByQuarterChartPro
         </p>
       </div>
       
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

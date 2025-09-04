@@ -15,9 +15,16 @@ export const ProductsPage = () => {
   const [selectedDealer, setSelectedDealer] = React.useState<string>("")
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
+          <div className="flex items-center space-x-2 border-b-2 border-green-500 pb-2">
+            <span className="text-green-600 font-medium">Products</span>
+            <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full">0</span>
+          </div>
+        </div>
         
         <div className="flex items-center space-x-3">
           <Combobox
@@ -44,33 +51,21 @@ export const ProductsPage = () => {
       </div>
 
       {/* Dashboard Tiles */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {/* Sales by Quarter Chart */}
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        {/* Sales by Quarter Chart - Takes 2 columns */}
+        <div className="xl:col-span-2">
           <SalesByQuarterChart selectedDealerId={selectedDealer} />
         </div>
         
-        {/* Sales by Product Chart */}
-        <SalesByProductChart selectedDealerId={selectedDealer} />
-        
-        {/* Top Customers Table */}
-        <div className="lg:col-span-2 xl:col-span-3">
-          <TopCustomersTable selectedDealerId={selectedDealer} />
+        {/* Sales by Product Chart - Takes 1 column */}
+        <div className="xl:col-span-1">
+          <SalesByProductChart selectedDealerId={selectedDealer} />
         </div>
-        
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart Placeholder 4</h3>
-          <div className="h-80 flex items-center justify-center text-gray-400">
-            <p>Additional chart coming soon...</p>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart Placeholder 5</h3>
-          <div className="h-80 flex items-center justify-center text-gray-400">
-            <p>Additional chart coming soon...</p>
-          </div>
-        </div>
+      </div>
+      
+      {/* Top Customers Table - Full width below charts */}
+      <div>
+        <TopCustomersTable selectedDealerId={selectedDealer} />
       </div>
     </div>
   )

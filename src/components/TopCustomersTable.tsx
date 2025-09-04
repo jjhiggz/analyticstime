@@ -69,8 +69,8 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="mb-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="mb-3">
         <h3 className="text-lg font-semibold text-gray-900">Top 10 Transacting Customers</h3>
         <p className="text-sm text-gray-500">
           Ranked by total transaction value
@@ -107,7 +107,7 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
                 }}
                 tabIndex={0}
               >
-                <td className="py-3 px-4">
+                <td className="py-2 px-4">
                   <div className="flex items-center space-x-2">
                     <span className="font-medium text-gray-900 text-sm">
                       {customer.name}
@@ -119,12 +119,12 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
                     )}
                   </div>
                 </td>
-                <td className="py-3 px-4 text-right">
+                <td className="py-2 px-4 text-right">
                   <span className="font-semibold text-gray-900">
                     {formatCurrency(customer.totalAmount)}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-2 px-4 text-center">
                   <span className="text-xs text-green-600 font-medium">
                     View Details →
                   </span>
