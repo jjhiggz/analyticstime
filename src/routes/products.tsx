@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ProductsPage } from "../components/ProductsPage";
 import { UPLLogo } from "../components/UPLLogo";
 
 export const Route = createFileRoute("/products")({
@@ -49,7 +50,9 @@ function ProductsWireframe() {
 			</nav>
 
 			{/* Main Content */}
-			<div className="p-6"></div>
+			<div className="p-6">
+				<ProductsPage />
+			</div>
 		</div>
 	);
 }
