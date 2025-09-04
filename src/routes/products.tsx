@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { UPLLogo } from '../components/UPLLogo'
 
 export const Route = createFileRoute('/products')({
   component: ProductsWireframe,
@@ -10,12 +11,8 @@ function ProductsWireframe() {
       {/* Top Navigation */}
       <nav className="bg-white border-b border-gray-200">
         <div className="px-6 py-3">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
-            </div>
+                      <div className="flex items-center space-x-8">
+              <UPLLogo size="md" />
             <div className="flex space-x-8">
               <button type="button" className="text-gray-600 hover:text-gray-900 pb-3 border-b-2 border-transparent">
                 Transactions
@@ -26,7 +23,7 @@ function ProductsWireframe() {
               <button type="button" className="text-gray-600 hover:text-gray-900 pb-3 border-b-2 border-transparent">
                 Programs
               </button>
-              <button type="button" className="text-blue-600 pb-3 border-b-2 border-blue-600 font-medium">
+              <button type="button" className="text-green-600 pb-3 border-b-2 border-green-600 font-medium">
                 Products
               </button>
             </div>
@@ -59,7 +56,7 @@ function ProductsWireframe() {
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
                 <svg className="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <title>Search</title>
@@ -69,7 +66,7 @@ function ProductsWireframe() {
               <button type="button" className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
                 Import CSV
               </button>
-              <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              <button type="button" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                 Add Product
               </button>
             </div>
