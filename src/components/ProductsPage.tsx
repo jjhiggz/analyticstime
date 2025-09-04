@@ -1,11 +1,12 @@
 import * as React from "react"
+import { dealers } from "../transactions.const"
 import { Combobox } from "./ui/combobox"
 
-const dealers = [
-  { value: "barrett", label: "Barrett" },
-  { value: "landus", label: "Landus" },
-  { value: "holganix", label: "Holganix" },
-]
+// Transform dealers for combobox format
+const dealerOptions = dealers.map(dealer => ({
+  value: dealer.id.toString(),
+  label: dealer.name
+}))
 
 export const ProductsPage = () => {
   const [selectedDealer, setSelectedDealer] = React.useState<string>("")
@@ -24,7 +25,7 @@ export const ProductsPage = () => {
         
         <div className="flex items-center space-x-3">
           <Combobox
-            options={dealers}
+            options={dealerOptions}
             value={selectedDealer}
             onValueChange={setSelectedDealer}
             placeholder="Select dealer..."
@@ -107,7 +108,7 @@ export const ProductsPage = () => {
             <p className="text-gray-500 text-lg">No Rows To Show</p>
             {selectedDealer && (
               <p className="text-sm text-gray-400 mt-2">
-                Filtered by: {dealers.find(d => d.value === selectedDealer)?.label}
+                Filtered by: {dealerOptions.find(d => d.value === selectedDealer)?.label}
               </p>
             )}
           </div>
