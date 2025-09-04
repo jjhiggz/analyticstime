@@ -17,10 +17,16 @@ interface CustomerDetailsModalProps {
   selectedDealerId?: string
 }
 
+interface ProductData {
+  name: string
+  value: number
+}
+
 interface CategoryData {
   name: string
   value: number
   color: string
+  products: ProductData[]
 }
 
 // Color mapping for category pills (same as other charts)
@@ -28,12 +34,9 @@ const categoryColors: Record<CategoryType, string> = {
   "biologicals": "#16a34a",      // Green
   "micronutrients": "#2563eb",   // Blue
   "adjuvants": "#dc2626",        // Red
-  "seed-treatment": "#ea580c",   // Orange
   "herbicide": "#7c3aed",        // Purple
-  "fungicidee": "#db2777",       // Pink
+  "fungicide": "#db2777",        // Pink
   "insecticide": "#0891b2",      // Cyan
-  "fertilizer": "#65a30d",       // Lime
-  "seed": "#eab308"              // Yellow
 }
 
 const calculateCustomerCategories = (customerId: number, dealerId?: string): CategoryData[] => {
@@ -44,19 +47,36 @@ const calculateCustomerCategories = (customerId: number, dealerId?: string): Cat
     return matchesCustomer && matchesDealer
   })
 
-  // Group by category
+  // Group by category and product
   const categoryData = customerTransactions.reduce((acc, transaction) => {
     const category = transaction.category
-    acc[category] = (acc[category] || 0) + transaction.amount
+    const productName = transaction.product.name
+    
+    if (!acc[category]) {
+      acc[category] = {
+        total: 0,
+        products: {} as Record<string, number>
+      }
+    }
+    
+    acc[category].total += transaction.amount
+    acc[category].products[productName] = (acc[category].products[productName] || 0) + transaction.amount
+    
     return acc
-  }, {} as Record<CategoryType, number>)
+  }, {} as Record<CategoryType, { total: number; products: Record<string, number> }>)
 
   // Convert to array format for pie chart
   return Object.entries(categoryData)
-    .map(([category, amount]) => ({
+    .map(([category, data]) => ({
       name: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' '),
-      value: amount,
-      color: categoryColors[category as CategoryType]
+      value: data.total,
+      color: categoryColors[category as CategoryType],
+      products: Object.entries(data.products)
+        .map(([productName, amount]) => ({
+          name: productName,
+          value: amount
+        }))
+        .sort((a, b) => b.value - a.value)
     }))
     .sort((a, b) => b.value - a.value)
 }

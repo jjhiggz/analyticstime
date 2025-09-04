@@ -3,18 +3,22 @@ import { faker } from '@faker-js/faker'
 type Customer = {
   name: string
   id: number
+  dealerId: number
+}
+
+type Product = {
+  id: number
+  name: string
+  category: string
 }
 
 type CategoryType =
   | "biologicals"
   | "micronutrients"
   | "adjuvants"
-  | "seed-treatment"
   | "herbicide"
-  | "fungicidee"
+  | "fungicide"
   | "insecticide"
-  | "fertilizer"
-  | "seed"
 
 type Dealer = {
   id: number
@@ -24,6 +28,7 @@ type Dealer = {
 type Transaction = {
   amount: number
   category: CategoryType
+  product: Product
   customer: Customer
   date: Date
   dealer: Dealer
@@ -33,7 +38,40 @@ type Transaction = {
 const dealers: Dealer[] = [
   { id: 1, name: "Barrett" },
   { id: 2, name: "Landus" },
-  { id: 3, name: "Holganix" }
+  { id: 3, name: "Big Yield" }
+]
+
+// Define the products for each category
+const products: Product[] = [
+  // Adjuvants
+  { id: 1, name: "Silwet Gold", category: "adjuvants" },
+  
+  // Biologicals
+  { id: 2, name: "Brus", category: "biologicals" },
+  { id: 3, name: "Extrasol", category: "biologicals" },
+  { id: 4, name: "Clover Inoculant", category: "biologicals" },
+  
+  // Fungicide
+  { id: 5, name: "Bluestone", category: "fungicide" },
+  { id: 6, name: "Aroxy 250 SC", category: "fungicide" },
+  { id: 7, name: "Benomyl", category: "fungicide" },
+  { id: 8, name: "Brilliant SL", category: "fungicide" },
+  { id: 9, name: "Evito C", category: "fungicide" },
+  
+  // Herbicide
+  { id: 10, name: "Alachlore", category: "herbicide" },
+  { id: 11, name: "Apmlify", category: "herbicide" },
+  { id: 12, name: "Armour", category: "herbicide" },
+  { id: 13, name: "Baseline 960", category: "herbicide" },
+  { id: 14, name: "Cheetah 600", category: "herbicide" },
+  
+  // Insecticide
+  { id: 15, name: "Akito", category: "insecticide" },
+  { id: 16, name: "Swat 150 SC", category: "insecticide" },
+  { id: 17, name: "Oxadate", category: "insecticide" },
+  { id: 18, name: "Desta 100 EC", category: "insecticide" }
+  
+  // Micronutrients: No products
 ]
 
 // Define the categories for random selection
@@ -41,18 +79,16 @@ const categories: CategoryType[] = [
   "biologicals",
   "micronutrients", 
   "adjuvants",
-  "seed-treatment",
   "herbicide",
-  "fungicidee",
-  "insecticide",
-  "fertilizer",
-  "seed"
+  "fungicide",
+  "insecticide"
 ]
 
-// Generate 20 customers
+// Generate 20 customers, each assigned to one dealer
 const customers: Customer[] = Array.from({ length: 20 }, (_, index) => ({
   id: index + 1,
-  name: faker.company.name()
+  name: faker.company.name(),
+  dealerId: (index % dealers.length) + 1 // Assign customers evenly across dealers
 }))
 
 // Helper function to get random item from array
@@ -68,14 +104,27 @@ const getRandomDateThisYear = (): Date => {
 }
 
 // Generate 1000 transactions
-export const transactions: Transaction[] = Array.from({ length: 1000 }, () => ({
-  amount: faker.number.float({ min: 100, max: 50000, fractionDigits: 2 }),
-  category: getRandomItem(categories),
-  customer: getRandomItem(customers),
-  date: getRandomDateThisYear(),
-  dealer: getRandomItem(dealers)
-}))
+export const transactions: Transaction[] = Array.from({ length: 1000 }, () => {
+  const customer = getRandomItem(customers)
+  const assignedDealer = dealers.find(d => d.id === customer.dealerId)!
+  const selectedCategory = getRandomItem(categories)
+  
+  // Get products for the selected category
+  const categoryProducts = products.filter(p => p.category === selectedCategory)
+  const selectedProduct = categoryProducts.length > 0 
+    ? getRandomItem(categoryProducts)
+    : { id: 0, name: "No Product", category: selectedCategory }
+  
+  return {
+    amount: faker.number.float({ min: 100, max: 50000, fractionDigits: 2 }),
+    category: selectedCategory,
+    product: selectedProduct,
+    customer: customer,
+    date: getRandomDateThisYear(),
+    dealer: assignedDealer
+  }
+})
 
 // Also export the supporting data
-export { dealers, customers, categories }
-export type { Transaction, Dealer, Customer, CategoryType }
+export { dealers, customers, categories, products }
+export type { Transaction, Dealer, Customer, CategoryType, Product }

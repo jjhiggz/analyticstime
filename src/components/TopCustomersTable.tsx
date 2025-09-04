@@ -10,6 +10,7 @@ interface CustomerData {
   id: number
   name: string
   totalAmount: number
+  dealer?: string
 }
 
 
@@ -27,19 +28,23 @@ const calculateTopCustomers = (dealerId?: string): CustomerData[] => {
       acc[customerId] = {
         id: transaction.customer.id,
         name: transaction.customer.name,
-        totalAmount: 0
+        totalAmount: 0,
+        dealer: transaction.dealer.name
       }
     }
     
     acc[customerId].totalAmount += transaction.amount
     
     return acc
-  }, {} as Record<number, { id: number; name: string; totalAmount: number }>)
+  }, {} as Record<number, { id: number; name: string; totalAmount: number; dealer: string }>)
 
-  // Convert to array and get top 5
+  // Convert to array and get top customers (10 for all dealers, 5 for specific dealer)
+  const isAllDealers = !dealerId || dealerId === ""
+  const topCount = isAllDealers ? 10 : 5
+  
   return Object.values(customerData)
     .sort((a, b) => b.totalAmount - a.totalAmount)
-    .slice(0, 5)
+    .slice(0, topCount)
 }
 
 const formatCurrency = (value: number) => {
@@ -59,6 +64,11 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   )
 
   const [selectedCustomer, setSelectedCustomer] = React.useState<CustomerData | null>(null)
+  
+  // Show dealer column when all dealers are selected (no specific dealer filter)
+  const showDealerColumn = !selectedDealerId || selectedDealerId === ""
+  const isAllDealers = !selectedDealerId || selectedDealerId === ""
+  const tableTitle = isAllDealers ? "Top 10 Transacting Customers" : "Top 5 Transacting Customers"
 
   const handleRowClick = (customer: CustomerData) => {
     setSelectedCustomer(customer)
@@ -71,8 +81,7 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="mb-3">
-                  <h3 className="text-base font-semibold text-gray-900">Top 5 Transacting Customers</h3>
-        
+        <h3 className="text-base font-semibold text-gray-900">{tableTitle}</h3>
       </div>
       
       <div className="overflow-hidden">
@@ -80,6 +89,9 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm">Name</th>
+              {showDealerColumn && (
+                <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm">Dealer</th>
+              )}
               <th className="text-right py-3 px-4 font-medium text-gray-700 text-sm">Total Amount</th>
               <th className="text-center py-3 px-4 font-medium text-gray-700 text-sm">Action</th>
             </tr>
@@ -112,6 +124,13 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
                     )}
                   </div>
                 </td>
+                {showDealerColumn && (
+                  <td className="py-2 px-4">
+                    <span className="text-sm text-gray-700">
+                      {customer.dealer || 'N/A'}
+                    </span>
+                  </td>
+                )}
                 <td className="py-2 px-4 text-right">
                   <span className="font-semibold text-gray-900">
                     {formatCurrency(customer.totalAmount)}

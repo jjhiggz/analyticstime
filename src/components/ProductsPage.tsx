@@ -48,13 +48,7 @@ export const ProductsPage = () => {
             type="button" 
             className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Import CSV
-          </button>
-          <button 
-            type="button" 
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-          >
-            Add Product
+            Export CSV
           </button>
         </div>
       </div>

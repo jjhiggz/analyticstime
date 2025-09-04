@@ -1,15 +1,14 @@
 import * as React from "react"
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { type CategoryType, categories, transactions } from "../transactions.const"
+import { type CategoryType, categories, transactions, products } from "../transactions.const"
 
 interface SalesByProductChartProps {
   selectedDealerId?: string
 }
 
-interface ProductData {
-  product: string
-  sales: number
-  color: string
+interface CategoryData {
+  category: string
+  [key: string]: string | number // Dynamic product keys
 }
 
 // Color palette for different product categories
@@ -17,37 +16,76 @@ const categoryColors: Record<CategoryType, string> = {
   "biologicals": "#16a34a",      // Green
   "micronutrients": "#2563eb",   // Blue
   "adjuvants": "#dc2626",        // Red
-  "seed-treatment": "#ea580c",   // Orange
   "herbicide": "#7c3aed",        // Purple
-  "fungicidee": "#db2777",       // Pink
+  "fungicide": "#db2777",        // Pink
   "insecticide": "#0891b2",      // Cyan
-  "fertilizer": "#65a30d",       // Lime
-  "seed": "#eab308"              // Yellow
 }
 
-const calculateProductSales = (dealerId?: string): ProductData[] => {
+// Generate distinct colors for products within each category
+const generateProductColors = (category: CategoryType, productCount: number): string[] => {
+  const baseColor = categoryColors[category]
+  const colors: string[] = []
+  
+  for (let i = 0; i < productCount; i++) {
+    // Create variations of the base color
+    const hue = i * (360 / productCount)
+    colors.push(`hsl(${hue}, 70%, 50%)`)
+  }
+  
+  return colors
+}
+
+const calculateProductSales = (dealerId?: string): { data: CategoryData[], productColors: Record<string, string> } => {
   // Filter transactions by dealer if selected (empty string means all dealers)
   const filteredTransactions = dealerId && dealerId !== "" 
     ? transactions.filter(t => t.dealer.id.toString() === dealerId)
     : transactions
 
-  // Group transactions by category (product)
-  const productData = filteredTransactions.reduce((acc, transaction) => {
+  // Group transactions by category and product
+  const categoryData: Record<string, Record<string, number>> = {}
+  
+  filteredTransactions.forEach(transaction => {
     const category = transaction.category
-    acc[category] = (acc[category] || 0) + transaction.amount
-    return acc
-  }, {} as Record<CategoryType, number>)
+    const productName = transaction.product.name
+    
+    if (!categoryData[category]) {
+      categoryData[category] = {}
+    }
+    
+    categoryData[category][productName] = (categoryData[category][productName] || 0) + transaction.amount
+  })
 
-  // Convert to array format for chart
-  return categories.map(category => ({
-    product: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' '),
-    sales: productData[category] || 0,
-    color: categoryColors[category]
-  })).sort((a, b) => a.product.localeCompare(b.product)) // Sort alphabetically
+  // Convert to array format for stacked bar chart - include ALL categories
+  const chartData: CategoryData[] = categories.map(category => {
+    const categoryProducts = products.filter(p => p.category === category)
+    const data: CategoryData = { category: category.charAt(0).toUpperCase() + category.slice(1) }
+    
+    // Only add products if they exist for this category
+    if (categoryProducts.length > 0) {
+      categoryProducts.forEach(product => {
+        data[product.name] = categoryData[category]?.[product.name] || 0
+      })
+    }
+    
+    return data
+  })
+
+  // Generate colors for each product
+  const productColors: Record<string, string> = {}
+  categories.forEach(category => {
+    const categoryProducts = products.filter(p => p.category === category)
+    const colors = generateProductColors(category, categoryProducts.length)
+    
+    categoryProducts.forEach((product, index) => {
+      productColors[product.name] = colors[index]
+    })
+  })
+
+  return { data: chartData, productColors }
 }
 
 export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartProps) => {
-  const data = React.useMemo(() => 
+  const { data, productColors } = React.useMemo(() => 
     calculateProductSales(selectedDealerId), 
     [selectedDealerId]
   )
@@ -61,8 +99,16 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
     }).format(value)
   }
 
-  const totalSales = data.reduce((sum, product) => sum + product.sales, 0)
+  // Calculate total sales across all categories and products
+  const totalSales = data.reduce((sum, category) => {
+    return sum + Object.entries(category)
+      .filter(([key]) => key !== 'category')
+      .reduce((catSum, [, value]) => catSum + (value as number), 0)
+  }, 0)
 
+  // Get all unique products for creating bars
+  const allProducts = products // Include all products
+  const productNames = allProducts.map(p => p.name)
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -86,12 +132,9 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
-              dataKey="product"
-              tick={{ fontSize: 10, fill: '#6b7280' }}
+              dataKey="category"
+              tick={{ fontSize: 12, fill: '#6b7280' }}
               axisLine={{ stroke: '#e5e7eb' }}
-              angle={-45}
-              textAnchor="end"
-              height={60}
             />
             <YAxis 
               tick={{ fontSize: 12, fill: '#6b7280' }}
@@ -99,7 +142,7 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
               tickFormatter={formatCurrency}
             />
             <Tooltip 
-              formatter={(value: number) => [formatCurrency(value), 'Sales']}
+              formatter={(value: number, name: string) => [formatCurrency(value), name]}
               labelStyle={{ color: '#374151', fontWeight: '500' }}
               contentStyle={{
                 backgroundColor: '#ffffff',
@@ -108,16 +151,15 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
               }}
             />
-            <Bar 
-              dataKey="sales" 
-              radius={[4, 4, 0, 0]}
-              stroke="#ffffff"
-              strokeWidth={1}
-            >
-              {data.map((entry) => (
-                <Cell key={entry.product} fill={entry.color} />
-              ))}
-            </Bar>
+            {productNames.map((productName) => (
+              <Bar 
+                key={productName}
+                dataKey={productName}
+                stackId="a"
+                fill={productColors[productName]}
+                name={productName}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </div>
