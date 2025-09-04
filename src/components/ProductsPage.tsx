@@ -18,13 +18,7 @@ export const ProductsPage = () => {
     <div className="space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
-          <div className="flex items-center space-x-2 border-b-2 border-green-500 pb-2">
-            <span className="text-green-600 font-medium">Products</span>
-            <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full">0</span>
-          </div>
-        </div>
+        
         
         <div className="flex items-center space-x-3">
           <Combobox
