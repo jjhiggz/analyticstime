@@ -29,7 +29,7 @@ export const ProductsPage = () => {
             onValueChange={setSelectedDealer}
             placeholder="Select dealer..."
             emptyText="No dealer found."
-            className="w-48"
+            className="w-60"
           />
           <button 
             type="button" 
