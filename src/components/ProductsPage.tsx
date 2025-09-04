@@ -1,5 +1,6 @@
 import * as React from "react"
 import { dealers } from "../transactions.const"
+import { SalesByProductChart } from "./SalesByProductChart"
 import { SalesByQuarterChart } from "./SalesByQuarterChart"
 import { Combobox } from "./ui/combobox"
 
@@ -55,13 +56,8 @@ export const ProductsPage = () => {
           <SalesByQuarterChart selectedDealerId={selectedDealer} />
         </div>
         
-        {/* Placeholder for additional charts */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart Placeholder 2</h3>
-          <div className="h-80 flex items-center justify-center text-gray-400">
-            <p>Additional chart coming soon...</p>
-          </div>
-        </div>
+        {/* Sales by Product Chart */}
+        <SalesByProductChart selectedDealerId={selectedDealer} />
         
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart Placeholder 3</h3>
