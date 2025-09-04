@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import logo from '../logo.png'
+import { UPLLogo } from '../components/UPLLogo'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -7,39 +7,26 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center space-y-8">
+        <UPLLogo size="lg" className="mx-auto" />
+        
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold text-gray-900">
+            UPL Analytics
+          </h1>
+          <p className="text-lg text-gray-600 max-w-md mx-auto">
+            View comprehensive sales analytics and customer insights
+          </p>
+        </div>
+        
         <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline mt-4 block"
           href="/products"
+          className="inline-flex items-center px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-lg"
         >
-          View Products Wireframe
+          Go to Products Dashboard
         </a>
-      </header>
+      </div>
     </div>
   )
 }
