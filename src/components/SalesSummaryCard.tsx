@@ -35,7 +35,14 @@ const getQuarterDateRange = (quarter: string) => {
   return { startDate, endDate }
 }
 
-const COLORS = ['#16a34a', '#2563eb', '#dc2626'] // Green, Blue, Red
+// Define consistent colors and order for dealers
+const DEALER_COLORS: Record<string, string> = {
+  'Barrett': '#16a34a',    // Green
+  'Big Yield': '#2563eb',  // Blue  
+  'Landus': '#dc2626'      // Red
+}
+
+const DEALER_ORDER = ['Barrett', 'Big Yield', 'Landus'] // Consistent order
 
 export const SalesSummaryCard = ({ selectedDealerId, selectedQuarter }: SalesSummaryCardProps) => {
   const { totalSales, dealerSales, percentage, dealerBreakdown, pieData } = React.useMemo(() => {
@@ -83,14 +90,14 @@ export const SalesSummaryCard = ({ selectedDealerId, selectedQuarter }: SalesSum
         }, {} as Record<string, number>)
       : null
     
-    // Prepare pie chart data
+    // Prepare pie chart data in consistent order
     const pieData = dealerBreakdown 
-      ? Object.entries(dealerBreakdown)
-          .sort(([,a], [,b]) => b - a)
-          .map(([dealer, amount], index) => ({
+      ? DEALER_ORDER
+          .filter(dealer => dealerBreakdown[dealer] > 0) // Only include dealers with sales
+          .map(dealer => ({
             name: dealer,
-            value: amount,
-            percentage: ((amount / allSales) * 100).toFixed(1)
+            value: dealerBreakdown[dealer],
+            percentage: ((dealerBreakdown[dealer] / allSales) * 100).toFixed(1)
           }))
       : []
     
@@ -136,8 +143,8 @@ export const SalesSummaryCard = ({ selectedDealerId, selectedQuarter }: SalesSum
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {pieData.map((entry) => (
+                      <Cell key={`cell-${entry.name}`} fill={DEALER_COLORS[entry.name]} />
                     ))}
                   </Pie>
                   <Tooltip 
