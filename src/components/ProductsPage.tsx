@@ -2,6 +2,7 @@ import * as React from "react"
 import { dealers } from "../transactions.const"
 import { SalesByProductChart } from "./SalesByProductChart"
 import { SalesByQuarterChart } from "./SalesByQuarterChart"
+import { SalesSummaryCard } from "./SalesSummaryCard"
 import { TopCustomersTable } from "./TopCustomersTable"
 import { Combobox } from "./ui/combobox"
 
@@ -24,9 +25,8 @@ export const ProductsPage = () => {
         <div className="flex items-center space-x-6">
           
           {/* Current Dealer Display */}
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">Viewing:</span>
-            <span className="text-sm font-medium text-gray-900">
+          <div className="flex items-center">
+            <span className="text-lg font-semibold text-gray-900">
               {selectedDealer ? 
                 dealerOptions.find(d => d.value === selectedDealer)?.label : 
                 "All Dealers"
@@ -54,22 +54,31 @@ export const ProductsPage = () => {
       </div>
 
       {/* Dashboard Tiles */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        {/* Sales by Quarter Chart - Takes 2 columns */}
-        <div className="xl:col-span-2">
+      <div className="grid grid-cols-1 xl:grid-cols-6 gap-5">
+        {/* Sales by Quarter Chart - Takes 4 columns */}
+        <div className="xl:col-span-4">
           <SalesByQuarterChart selectedDealerId={selectedDealer} />
         </div>
         
-        {/* Sales by Product Chart - Takes 1 column */}
-        <div className="xl:col-span-1">
-          <SalesByProductChart selectedDealerId={selectedDealer} />
+        {/* Sales Summary Card - Takes 2 columns */}
+        <div className="xl:col-span-2">
+          <SalesSummaryCard selectedDealerId={selectedDealer} />
         </div>
       </div>
       
-      {/* Top Customers Table - Full width below charts */}
-      <div>
-        <TopCustomersTable selectedDealerId={selectedDealer} />
+      {/* Bottom Row - Sales by Product Chart and Top Customers Table */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        {/* Sales by Product Chart - Takes 1 column */}
+        <div className="h-96">
+          <SalesByProductChart selectedDealerId={selectedDealer} />
+        </div>
+        
+        {/* Top Customers Table - Takes 1 column */}
+        <div className="h-96">
+          <TopCustomersTable selectedDealerId={selectedDealer} />
+        </div>
       </div>
     </div>
   )
 }
+

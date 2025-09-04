@@ -38,9 +38,8 @@ const calculateTopCustomers = (dealerId?: string): CustomerData[] => {
     return acc
   }, {} as Record<number, { id: number; name: string; totalAmount: number; dealer: string }>)
 
-  // Convert to array and get top customers (10 for all dealers, 5 for specific dealer)
-  const isAllDealers = !dealerId || dealerId === ""
-  const topCount = isAllDealers ? 10 : 5
+  // Convert to array and get top customers (10 for all dealers, 10 for specific dealer)
+  const topCount = 10
   
   return Object.values(customerData)
     .sort((a, b) => b.totalAmount - a.totalAmount)
@@ -67,8 +66,7 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   
   // Show dealer column when all dealers are selected (no specific dealer filter)
   const showDealerColumn = !selectedDealerId || selectedDealerId === ""
-  const isAllDealers = !selectedDealerId || selectedDealerId === ""
-  const tableTitle = isAllDealers ? "Top 10 Transacting Customers" : "Top 5 Transacting Customers"
+  const tableTitle = "Top 10 Transacting Customers"
 
   const handleRowClick = (customer: CustomerData) => {
     setSelectedCustomer(customer)
@@ -79,12 +77,12 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 h-full flex flex-col">
       <div className="mb-3">
         <h3 className="text-base font-semibold text-gray-900">{tableTitle}</h3>
       </div>
       
-      <div className="overflow-hidden">
+      <div className="overflow-y-auto flex-1">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
