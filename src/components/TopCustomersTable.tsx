@@ -1,5 +1,5 @@
 import * as React from "react"
-import { type CategoryType, transactions } from "../transactions.const"
+import { transactions } from "../transactions.const"
 import { CustomerDetailsModal } from "./CustomerDetailsModal"
 
 interface TopCustomersTableProps {
@@ -36,10 +36,10 @@ const calculateTopCustomers = (dealerId?: string): CustomerData[] => {
     return acc
   }, {} as Record<number, { id: number; name: string; totalAmount: number }>)
 
-  // Convert to array and get top 10
+  // Convert to array and get top 5
   return Object.values(customerData)
     .sort((a, b) => b.totalAmount - a.totalAmount)
-    .slice(0, 10)
+    .slice(0, 5)
 }
 
 const formatCurrency = (value: number) => {
@@ -71,15 +71,8 @@ export const TopCustomersTable = ({ selectedDealerId }: TopCustomersTableProps) 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">Top 10 Transacting Customers</h3>
-        <p className="text-sm text-gray-500">
-          Ranked by total transaction value
-          {selectedDealerId && (
-            <span className="ml-2 text-green-600">
-              (Filtered by dealer)
-            </span>
-          )}
-        </p>
+                  <h3 className="text-base font-semibold text-gray-900">Top 5 Transacting Customers</h3>
+        
       </div>
       
       <div className="overflow-hidden">

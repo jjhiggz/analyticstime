@@ -1,6 +1,6 @@
 import * as React from "react"
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { type Dealer, transactions } from "../transactions.const"
+import { transactions } from "../transactions.const"
 
 interface SalesByQuarterChartProps {
   selectedDealerId?: string
@@ -78,7 +78,7 @@ export const SalesByQuarterChart = ({ selectedDealerId }: SalesByQuarterChartPro
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">Net Sales by Quarter</h3>
+        <h3 className="text-base font-semibold text-gray-900">Net Sales by Quarter</h3>
         <p className="text-sm text-gray-500">
           Total: {formatCurrency(totalSales)}
           {selectedDealerId && (
