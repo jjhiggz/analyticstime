@@ -115,6 +115,8 @@ export const SalesByQuarterChart = ({ selectedDealerId }: SalesByQuarterChartPro
               tick={{ fontSize: 12, fill: '#6b7280' }}
               axisLine={{ stroke: '#e5e7eb' }}
               tickFormatter={formatCurrency}
+              domain={['dataMin', 'dataMax']}
+              scale="linear"
             />
             <Tooltip 
               formatter={(value: number) => [formatCurrency(value), 'Sales']}
