@@ -28,8 +28,8 @@ const getMonthInfo = (date: Date) => {
 }
 
 const calculateMonthlySales = (dealerId?: string): MonthlyData[] => {
-  // Filter transactions by dealer if selected
-  const filteredTransactions = dealerId 
+  // Filter transactions by dealer if selected (empty string means all dealers)
+  const filteredTransactions = dealerId && dealerId !== "" 
     ? transactions.filter(t => t.dealer.id.toString() === dealerId)
     : transactions
 

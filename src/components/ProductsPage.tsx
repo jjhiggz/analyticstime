@@ -5,11 +5,14 @@ import { SalesByQuarterChart } from "./SalesByQuarterChart"
 import { TopCustomersTable } from "./TopCustomersTable"
 import { Combobox } from "./ui/combobox"
 
-// Transform dealers for combobox format
-const dealerOptions = dealers.map(dealer => ({
-  value: dealer.id.toString(),
-  label: dealer.name
-}))
+// Transform dealers for combobox format with "All" option
+const dealerOptions = [
+  { value: "", label: "All Dealers" },
+  ...dealers.map(dealer => ({
+    value: dealer.id.toString(),
+    label: dealer.name
+  }))
+]
 
 export const ProductsPage = () => {
   const [selectedDealer, setSelectedDealer] = React.useState<string>("")
@@ -19,6 +22,17 @@ export const ProductsPage = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
+          
+          {/* Current Dealer Display */}
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">Viewing:</span>
+            <span className="text-sm font-medium text-gray-900">
+              {selectedDealer ? 
+                dealerOptions.find(d => d.value === selectedDealer)?.label : 
+                "All Dealers"
+              }
+            </span>
+          </div>
         </div>
         
         <div className="flex items-center space-x-3">

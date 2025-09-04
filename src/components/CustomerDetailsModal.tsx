@@ -37,10 +37,10 @@ const categoryColors: Record<CategoryType, string> = {
 }
 
 const calculateCustomerCategories = (customerId: number, dealerId?: string): CategoryData[] => {
-  // Filter transactions by customer and optionally by dealer
+  // Filter transactions by customer and optionally by dealer (empty string means all dealers)
   const customerTransactions = transactions.filter(t => {
     const matchesCustomer = t.customer.id === customerId
-    const matchesDealer = dealerId ? t.dealer.id.toString() === dealerId : true
+    const matchesDealer = dealerId && dealerId !== "" ? t.dealer.id.toString() === dealerId : true
     return matchesCustomer && matchesDealer
   })
 
