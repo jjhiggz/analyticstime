@@ -43,7 +43,7 @@ const calculateProductSales = (dealerId?: string): ProductData[] => {
     product: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' '),
     sales: productData[category] || 0,
     color: categoryColors[category]
-  })).sort((a, b) => b.sales - a.sales) // Sort by sales descending
+  })).sort((a, b) => a.product.localeCompare(b.product)) // Sort alphabetically
 }
 
 export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartProps) => {
