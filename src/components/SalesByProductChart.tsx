@@ -218,7 +218,7 @@ export const SalesByProductChart = ({ selectedDealerId, selectedQuarter }: Sales
               tick={{ fontSize: 11, fill: '#6b7280' }}
               axisLine={{ stroke: '#e5e7eb' }}
               interval={0}
-              angle={-90}
+              angle={-45}
               textAnchor="end"
               height={60}
             />
