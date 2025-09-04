@@ -4,6 +4,7 @@ import { type CategoryType, categories, transactions, products } from "../transa
 
 interface SalesByProductChartProps {
   selectedDealerId?: string
+  selectedQuarter: string
 }
 
 interface CategoryData {
@@ -85,11 +86,50 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 
-const calculateProductSales = (dealerId?: string): { data: CategoryData[], productColors: Record<string, string> } => {
+const getQuarterDateRange = (quarter: string) => {
+  const [q, year] = quarter.split(' ')
+  const yearNum = parseInt(year)
+  const quarterNum = parseInt(q.replace('Q', ''))
+  
+  const quarterMonths = {
+    1: { start: 0, end: 2 },   // Q1: Jan-Mar
+    2: { start: 3, end: 5 },   // Q2: Apr-Jun
+    3: { start: 6, end: 8 },   // Q3: Jul-Sep
+    4: { start: 9, end: 11 }   // Q4: Oct-Dec
+  }
+  
+  const { start, end } = quarterMonths[quarterNum as keyof typeof quarterMonths]
+  const startDate = new Date(yearNum, start, 1)
+  const endDate = new Date(yearNum, end + 1, 0) // Last day of the quarter
+  
+  return { startDate, endDate }
+}
+
+const calculateProductSales = (dealerId?: string, selectedQuarter: string): { data: CategoryData[], productColors: Record<string, string> } => {
   // Filter transactions by dealer if selected (empty string means all dealers)
-  const filteredTransactions = dealerId && dealerId !== "" 
+  let filteredTransactions = dealerId && dealerId !== "" 
     ? transactions.filter(t => t.dealer.id.toString() === dealerId)
     : transactions
+
+  if (selectedQuarter === "past-12-months") {
+    // For past 12 months, use Oct 2024 - Sept 2025
+    const startDate = new Date(2024, 9, 1) // Oct 1, 2024
+    const endDate = new Date(2025, 8, 30) // Sept 30, 2025
+    
+    filteredTransactions = filteredTransactions.filter(t => {
+      const transactionDate = new Date(t.date)
+      return transactionDate >= startDate && transactionDate <= endDate
+    })
+  } else {
+    // Get quarter date range
+    const { startDate, endDate } = getQuarterDateRange(selectedQuarter)
+    
+    // Filter by quarter
+    filteredTransactions = filteredTransactions.filter(t => {
+      const transactionDate = new Date(t.date)
+      return transactionDate >= startDate && transactionDate <= endDate
+    })
+  }
 
   // Group transactions by category and product
   const categoryData: Record<string, Record<string, number>> = {}
@@ -134,10 +174,10 @@ const calculateProductSales = (dealerId?: string): { data: CategoryData[], produ
   return { data: chartData, productColors }
 }
 
-export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartProps) => {
+export const SalesByProductChart = ({ selectedDealerId, selectedQuarter }: SalesByProductChartProps) => {
   const { data, productColors } = React.useMemo(() => 
-    calculateProductSales(selectedDealerId), 
-    [selectedDealerId]
+    calculateProductSales(selectedDealerId, selectedQuarter), 
+    [selectedDealerId, selectedQuarter]
   )
 
 
@@ -157,7 +197,7 @@ export const SalesByProductChart = ({ selectedDealerId }: SalesByProductChartPro
       <div className="mb-3">
         <h3 className="text-base font-semibold text-gray-900">Net Sales by Product</h3>
         <p className="text-sm text-gray-500">
-          Total: {formatCurrency(totalSales)} across all products
+          Total: {formatCurrency(totalSales)} across all products - {selectedQuarter === "past-12-months" ? "Past 12 Months" : selectedQuarter}
           {selectedDealerId && (
             <span className="ml-2 text-green-600">
               (Filtered by dealer)

@@ -17,6 +17,16 @@ const dealerOptions = [
 
 export const ProductsPage = () => {
   const [selectedDealer, setSelectedDealer] = React.useState<string>("")
+  const [selectedQuarter, setSelectedQuarter] = React.useState<string>("past-12-months") // Default to past 12 months
+
+  const quarterOptions = [
+    { value: "past-12-months", label: "Past 12 Months" },
+    { value: "Q4 2024", label: "Q4 2024" },
+    { value: "Q1 2025", label: "Q1 2025" },
+    { value: "Q2 2025", label: "Q2 2025" },
+    { value: "Q3 2025", label: "Q3 2025" },
+    { value: "Q4 2025", label: "Q4 2025" }
+  ]
 
   return (
     <div className="space-y-4">
@@ -25,13 +35,20 @@ export const ProductsPage = () => {
         <div className="flex items-center space-x-6">
           
           {/* Current Dealer Display */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-6">
             <span className="text-lg font-semibold text-gray-900">
               {selectedDealer ? 
                 dealerOptions.find(d => d.value === selectedDealer)?.label : 
                 "All Dealers"
               }
             </span>
+            <Combobox
+              options={quarterOptions}
+              value={selectedQuarter}
+              onValueChange={setSelectedQuarter}
+              placeholder="Select Quarter"
+              className="w-60"
+            />
           </div>
         </div>
         
@@ -57,12 +74,18 @@ export const ProductsPage = () => {
       <div className="grid grid-cols-1 xl:grid-cols-6 gap-5">
         {/* Sales by Quarter Chart - Takes 4 columns */}
         <div className="xl:col-span-4">
-          <SalesByQuarterChart selectedDealerId={selectedDealer} />
+          <SalesByQuarterChart 
+            selectedDealerId={selectedDealer} 
+            selectedQuarter={selectedQuarter}
+          />
         </div>
         
         {/* Sales Summary Card - Takes 2 columns */}
         <div className="xl:col-span-2">
-          <SalesSummaryCard selectedDealerId={selectedDealer} />
+          <SalesSummaryCard 
+            selectedDealerId={selectedDealer} 
+            selectedQuarter={selectedQuarter}
+          />
         </div>
       </div>
       
@@ -70,12 +93,18 @@ export const ProductsPage = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         {/* Sales by Product Chart - Takes 1 column */}
         <div className="h-96">
-          <SalesByProductChart selectedDealerId={selectedDealer} />
+          <SalesByProductChart 
+            selectedDealerId={selectedDealer} 
+            selectedQuarter={selectedQuarter}
+          />
         </div>
         
         {/* Top Customers Table - Takes 1 column */}
         <div className="h-96">
-          <TopCustomersTable selectedDealerId={selectedDealer} />
+          <TopCustomersTable 
+            selectedDealerId={selectedDealer} 
+            selectedQuarter={selectedQuarter}
+          />
         </div>
       </div>
     </div>

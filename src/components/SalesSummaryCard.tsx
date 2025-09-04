@@ -1,8 +1,10 @@
 import * as React from "react"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { transactions } from "../transactions.const"
 
 interface SalesSummaryCardProps {
   selectedDealerId?: string
+  selectedQuarter: string
 }
 
 const formatCurrency = (value: number) => {
@@ -14,15 +16,58 @@ const formatCurrency = (value: number) => {
   }).format(value)
 }
 
-export const SalesSummaryCard = ({ selectedDealerId }: SalesSummaryCardProps) => {
-  const { totalSales, dealerSales, percentage, dealerBreakdown } = React.useMemo(() => {
+const getQuarterDateRange = (quarter: string) => {
+  const [q, year] = quarter.split(' ')
+  const yearNum = parseInt(year)
+  const quarterNum = parseInt(q.replace('Q', ''))
+  
+  const quarterMonths = {
+    1: { start: 0, end: 2 },   // Q1: Jan-Mar
+    2: { start: 3, end: 5 },   // Q2: Apr-Jun
+    3: { start: 6, end: 8 },   // Q3: Jul-Sep
+    4: { start: 9, end: 11 }   // Q4: Oct-Dec
+  }
+  
+  const { start, end } = quarterMonths[quarterNum as keyof typeof quarterMonths]
+  const startDate = new Date(yearNum, start, 1)
+  const endDate = new Date(yearNum, end + 1, 0) // Last day of the quarter
+  
+  return { startDate, endDate }
+}
+
+const COLORS = ['#16a34a', '#2563eb', '#dc2626'] // Green, Blue, Red
+
+export const SalesSummaryCard = ({ selectedDealerId, selectedQuarter }: SalesSummaryCardProps) => {
+  const { totalSales, dealerSales, percentage, dealerBreakdown, pieData } = React.useMemo(() => {
+    let dateFilteredTransactions = transactions
+    
+    if (selectedQuarter === "past-12-months") {
+      // For past 12 months, use Oct 2024 - Sept 2025
+      const startDate = new Date(2024, 9, 1) // Oct 1, 2024
+      const endDate = new Date(2025, 8, 30) // Sept 30, 2025
+      
+      dateFilteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.date)
+        return transactionDate >= startDate && transactionDate <= endDate
+      })
+    } else {
+      // Get quarter date range
+      const { startDate, endDate } = getQuarterDateRange(selectedQuarter)
+      
+      // Filter transactions by quarter
+      dateFilteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.date)
+        return transactionDate >= startDate && transactionDate <= endDate
+      })
+    }
+    
     // Calculate total sales across all dealers
-    const allSales = transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
+    const allSales = dateFilteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0)
     
     // Calculate sales for selected dealer (or all dealers if none selected)
     const filteredTransactions = selectedDealerId && selectedDealerId !== "" 
-      ? transactions.filter(t => t.dealer.id.toString() === selectedDealerId)
-      : transactions
+      ? dateFilteredTransactions.filter(t => t.dealer.id.toString() === selectedDealerId)
+      : dateFilteredTransactions
     
     const dealerSales = filteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0)
     
@@ -31,20 +76,32 @@ export const SalesSummaryCard = ({ selectedDealerId }: SalesSummaryCardProps) =>
     
     // Calculate dealer breakdown when all dealers are selected
     const dealerBreakdown = !selectedDealerId || selectedDealerId === "" 
-      ? transactions.reduce((acc, transaction) => {
+      ? dateFilteredTransactions.reduce((acc, transaction) => {
           const dealerName = transaction.dealer.name
           acc[dealerName] = (acc[dealerName] || 0) + transaction.amount
           return acc
         }, {} as Record<string, number>)
       : null
     
+    // Prepare pie chart data
+    const pieData = dealerBreakdown 
+      ? Object.entries(dealerBreakdown)
+          .sort(([,a], [,b]) => b - a)
+          .map(([dealer, amount], index) => ({
+            name: dealer,
+            value: amount,
+            percentage: ((amount / allSales) * 100).toFixed(1)
+          }))
+      : []
+    
     return {
       totalSales: allSales,
       dealerSales,
       percentage,
-      dealerBreakdown
+      dealerBreakdown,
+      pieData
     }
-  }, [selectedDealerId])
+  }, [selectedDealerId, selectedQuarter])
 
   const dealerName = selectedDealerId && selectedDealerId !== "" 
     ? transactions.find(t => t.dealer.id.toString() === selectedDealerId)?.dealer.name || "Selected Dealer"
@@ -55,46 +112,84 @@ export const SalesSummaryCard = ({ selectedDealerId }: SalesSummaryCardProps) =>
       <div className="mb-4">
         <h3 className="text-base font-semibold text-gray-900">Sales Summary</h3>
         <p className="text-sm text-gray-500">
-          {dealerName} performance
+          {dealerName} performance - {selectedQuarter === "past-12-months" ? "Past 12 Months" : selectedQuarter}
         </p>
       </div>
       
       <div className="flex-1 flex flex-col justify-center space-y-4">
-        {/* Total Sales */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            {formatCurrency(totalSales)}
-          </div>
-          <div className="text-sm text-gray-500 mt-1">
-            Total Sales
-          </div>
-        </div>
-        
-        {/* Dealer Sales or Breakdown */}
+        {/* Dealer Sales or Pie Chart */}
         {dealerBreakdown ? (
-          // Show dealer breakdown when all dealers are selected
-          <div className="space-y-2">
+          // Show pie chart when all dealers are selected
+          <div className="flex-1 flex flex-col">
             <div className="text-center mb-3">
               <div className="text-lg font-semibold text-gray-700">Sales by Dealer</div>
             </div>
-            {Object.entries(dealerBreakdown)
-              .sort(([,a], [,b]) => b - a)
-              .map(([dealer, amount]) => {
-                const dealerPercentage = (amount / totalSales) * 100
-                return (
-                  <div key={dealer} className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">{dealer}</span>
-                    <div className="text-right">
-                      <div className="font-semibold text-gray-900">{formatCurrency(amount)}</div>
-                      <div className="text-xs text-gray-500">{dealerPercentage.toFixed(1)}%</div>
-                    </div>
+            <div className="flex-1 min-h-0 relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: number, name, props) => [
+                      formatCurrency(value), 
+                      `${props.payload.name} (${props.payload.percentage}%)`
+                    ]}
+                    labelStyle={{ color: '#374151' }}
+                    contentStyle={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value, entry) => (
+                      <span style={{ color: '#374151', fontSize: '12px' }}>
+                        {value} ({entry.payload.percentage}%)
+                      </span>
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Total Sales in Center */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-gray-900">
+                    {formatCurrency(totalSales)}
                   </div>
-                )
-              })}
+                  <div className="text-xs text-gray-500">
+                    Total
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           // Show individual dealer sales when specific dealer is selected
           <>
+            {/* Total Sales */}
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">
+                {formatCurrency(totalSales)}
+              </div>
+              <div className="text-sm text-gray-500 mt-1">
+                Total Sales
+              </div>
+            </div>
+            
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">
                 {formatCurrency(dealerSales)}
@@ -110,7 +205,7 @@ export const SalesSummaryCard = ({ selectedDealerId }: SalesSummaryCardProps) =>
                 {percentage.toFixed(1)}%
               </div>
               <div className="text-sm text-gray-500 mt-1">
-                Market Share
+                Dealer Revenue Share
               </div>
             </div>
           </>
