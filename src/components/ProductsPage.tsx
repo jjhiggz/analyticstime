@@ -18,7 +18,8 @@ export const ProductsPage = () => {
     <div className="space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        
+        <div className="flex items-center space-x-6">
+        </div>
         
         <div className="flex items-center space-x-3">
           <Combobox
