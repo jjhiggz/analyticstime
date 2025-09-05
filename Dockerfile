@@ -50,4 +50,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000/ || exit 1
 
 # Start the application using bun run start
-CMD ["bun", "run", "start"]
+CMD ["/bin/sh", "-lc", "ln -snf /usr/src/app/.output/public/assets /usr/src/app/.output/public/_build/assets 2>/dev/null || true; bun run start"]

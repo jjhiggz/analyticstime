@@ -19,7 +19,7 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
-    ssr: false,
+    // Ensure head is rendered on the server
     meta: [
       {
         charSet: 'utf-8',
