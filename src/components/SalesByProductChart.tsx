@@ -63,7 +63,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div>
           <p className="text-xs font-medium text-gray-700 mb-2">Products:</p>
           <div className="space-y-1">
-            {payload.map((item: any, index: number) => (
+            {payload.slice().reverse().map((item: any, index: number) => (
               <div key={index} className="flex justify-between items-center text-xs">
                 <div className="flex items-center">
                   <div 
