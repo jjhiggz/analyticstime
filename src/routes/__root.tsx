@@ -19,6 +19,7 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
+    ssr: false,
     meta: [
       {
         charSet: 'utf-8',
